@@ -46,6 +46,10 @@ export class DaemonIPCServer {
         await this.handleShutdown(message, socket);
         break;
 
+      case 'debug_state':
+        await this.handleDebugState(message, socket);
+        break;
+
       default:
         throw new Error(`Unknown IPC message type: ${message.type}`);
     }
@@ -146,6 +150,24 @@ export class DaemonIPCServer {
 
   async start() {
     await this.server.start();
+  }
+
+  async handleDebugState(message, socket) {
+    const debugInfo = {
+      keystore: {
+        hasKeystore: this.keystore.hasKeystore(),
+        isLocked: this.keystore.isLocked,
+        encryptedData: !!this.keystore.encryptedData,
+        accounts: this.keystore.isLocked ? '(locked)' : this.keystore.getAccounts(),
+        walletData: this.keystore.isLocked ? '(locked)' : !!this.keystore.walletData
+      },
+      session: this.sessionManager.getStatus(),
+      keystoreFiles: await this.keystore.countKeystoreFiles?.() || 'N/A'
+    };
+    
+    const response = new IPCMessage('debug_state_response', debugInfo);
+    response.id = message.id;
+    this.server.sendToClient(socket, response);
   }
 
   async stop() {

@@ -34,8 +34,14 @@ export class EnhancedKeystore extends EventEmitter {
       
       // Check current state
       if (this.keystore.hasKeystore()) {
-        this.emit(KEYSTORE_EVENTS.LOADED);
         console.log(chalk.green('✅ Keystore loaded and watching for changes'));
+        console.log(chalk.blue('📊 Keystore state:'), {
+          hasKeystore: this.keystore.hasKeystore(),
+          isLocked: this.keystore.isLocked,
+          encryptedData: !!this.keystore.encryptedData,
+          keystorePath: this.keystore.keystorePath
+        });
+        this.emit(KEYSTORE_EVENTS.LOADED);
       } else {
         console.log(chalk.yellow('📭 No keystore found, watching for creation'));
       }
@@ -205,15 +211,51 @@ export class EnhancedKeystore extends EventEmitter {
     return await this.keystore.signMessage(message, address);
   }
 
+  // Proxy all the advanced account management methods
+  async createNextAccount(password) {
+    return await this.keystore.createNextAccount(password);
+  }
+
+  async hideAccount(address, password) {
+    return await this.keystore.hideAccount(address, password);
+  }
+
+  async showAccount(address, password) {
+    return await this.keystore.showAccount(address, password);
+  }
+
+  async setAccountLabel(address, label, password) {
+    return await this.keystore.setAccountLabel(address, label, password);
+  }
+
+  getAccountDetails(address) {
+    return this.keystore.getAccountDetails(address);
+  }
+
+  getAllAccountDetails(includeHidden = false) {
+    return this.keystore.getAllAccountDetails(includeHidden);
+  }
+
   get encryptedData() {
     return this.keystore.encryptedData;
   }
 
+  get walletData() {
+    return this.keystore.walletData;
+  }
+
+  get wallets() {
+    return this.keystore.wallets;
+  }
+
   async countKeystoreFiles() {
     try {
+      await fs.mkdir(KEYSTORE_DIR, { recursive: true });
       const files = await fs.readdir(KEYSTORE_DIR);
-      return files.filter(f => f.endsWith('.json')).length;
+      const keystoreFiles = files.filter(f => f.endsWith('.json'));
+      return keystoreFiles.length;
     } catch (error) {
+      console.error(chalk.red('❌ Error counting keystore files:'), error.message);
       return 0;
     }
   }

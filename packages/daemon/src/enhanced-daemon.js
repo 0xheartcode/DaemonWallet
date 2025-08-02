@@ -44,7 +44,7 @@ export class EnhancedDaemonService {
     this.keystore.on(KEYSTORE_EVENTS.LOADED, () => {
       console.log(chalk.green('📦 Keystore loaded'));
       this.stateManager.emit(DAEMON_EVENTS.KEYSTORE_LOADED);
-      this._updateStateFromKeystore();
+      // Don't update state here - wait for init to complete
     });
 
     this.keystore.on(KEYSTORE_EVENTS.CHANGED, (details) => {
@@ -54,16 +54,22 @@ export class EnhancedDaemonService {
     });
 
     this.keystore.on(KEYSTORE_EVENTS.UNLOCKED, (data) => {
-      this.sessionManager.unlock(data.accounts);
-      this.stateManager.transition(DAEMON_STATES.UNLOCKED, { 
-        accounts: data.accounts,
-        unlockTime: Date.now()
-      });
+      // Only update session if we're not already in the correct state
+      if (this.stateManager.getCurrentState() !== DAEMON_STATES.UNLOCKED) {
+        this.sessionManager.unlock(data.accounts);
+        this.stateManager.transition(DAEMON_STATES.UNLOCKED, { 
+          accounts: data.accounts,
+          unlockTime: Date.now()
+        });
+      }
     });
 
     this.keystore.on(KEYSTORE_EVENTS.LOCKED, () => {
-      this.sessionManager.lock();
-      this.stateManager.transition(DAEMON_STATES.LOCKED);
+      // Only update session if we're not already in the correct state
+      if (this.stateManager.getCurrentState() !== DAEMON_STATES.LOCKED) {
+        this.sessionManager.lock();
+        this.stateManager.transition(DAEMON_STATES.LOCKED);
+      }
     });
 
     this.keystore.on(KEYSTORE_EVENTS.ERROR, (error) => {
@@ -511,19 +517,35 @@ export class EnhancedDaemonService {
   }
 
   _updateStateFromKeystore() {
+    const currentState = this.stateManager.getCurrentState();
+    
+    // Don't update if we're still starting
+    if (currentState === DAEMON_STATES.STARTING) {
+      return;
+    }
+    
     if (!this.keystore.hasKeystore()) {
-      this.stateManager.transition(DAEMON_STATES.READY, { 
-        hasKeystore: false 
-      });
+      // Only transition if not already in READY state
+      if (currentState !== DAEMON_STATES.READY) {
+        this.stateManager.transition(DAEMON_STATES.READY, { 
+          hasKeystore: false 
+        });
+      }
     } else if (this.keystore.isLocked) {
-      this.stateManager.transition(DAEMON_STATES.LOCKED, { 
-        hasKeystore: true 
-      });
+      // Only transition if not already in LOCKED state
+      if (currentState !== DAEMON_STATES.LOCKED) {
+        this.stateManager.transition(DAEMON_STATES.LOCKED, { 
+          hasKeystore: true 
+        });
+      }
     } else {
-      this.stateManager.transition(DAEMON_STATES.UNLOCKED, { 
-        hasKeystore: true,
-        accounts: this.keystore.getAccounts()
-      });
+      // Only transition if not already in UNLOCKED state
+      if (currentState !== DAEMON_STATES.UNLOCKED) {
+        this.stateManager.transition(DAEMON_STATES.UNLOCKED, { 
+          hasKeystore: true,
+          accounts: this.keystore.getAccounts()
+        });
+      }
     }
   }
 
@@ -531,10 +553,14 @@ export class EnhancedDaemonService {
     const daemonStatus = this.stateManager.getStatus();
     const sessionStatus = this.sessionManager.getStatus();
     
+    // Get actual accounts from keystore (not from session)
+    const accounts = this.keystore.isLocked ? [] : this.keystore.getAccounts();
+    
     return {
       ...daemonStatus,
       ...sessionStatus,
       hasKeystore: this.keystore.hasKeystore(),
+      accounts: accounts, // Override session accounts with actual keystore accounts
       keystoreCount: 0, // Will be filled by IPC handler
       uptime: Date.now() - this.startTime,
       version: '0.2.0-enhanced'
