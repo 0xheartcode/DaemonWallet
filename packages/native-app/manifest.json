@@ -1,0 +1,9 @@
+{
+  "name": "com.example.helloworld",
+  "description": "Hello World Node.js Native Messaging Host",
+  "path": "/Users/hacker/Documents/web3/daemonWallet/packages/native-app/index.js",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://camigealbklbnihfkfginccdkcgikafb/"
+  ]
+}
