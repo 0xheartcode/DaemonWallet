@@ -2,6 +2,8 @@
 
 **A secure Ethereum wallet using Chrome Native Messaging**
 
+> **Heavily vibecoded project, use at your own risk.** Sometimes I type bugs by hand in here, to be a bit real.
+
 ## Overview
 
 Daemon Wallet implements a secure wallet architecture where private keys are managed by a CLI application that communicates with a Chrome extension via Native Messaging. This follows the security model pioneered by KeePassXC.
