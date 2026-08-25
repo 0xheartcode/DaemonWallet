@@ -1,0 +1,18 @@
+[package]
+name = "daemon-wallet-evm"
+description = "EVM implementation of daemon-wallet-core's Chain trait: secp256k1/keccak derivation, transaction and signature types, and a pinned EVM chain-info registry with a safe external merge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["ethereum", "evm", "wallet", "secp256k1", "signing"]
+categories = ["cryptography::cryptocurrencies"]
+
+[dependencies]
+daemon-wallet-core.workspace = true
+daemon-wallet-vault.workspace = true
+alloy-primitives.workspace = true
+serde.workspace = true
+ciborium.workspace = true
+thiserror.workspace = true
+zeroize.workspace = true

@@ -1,0 +1,20 @@
+[package]
+name = "daemon-wallet-core"
+description = "Chain-agnostic wallet organisation model: nested group tree, seeds, imported keys, accounts, manifest persistence, and the narrow Chain abstraction the concrete chains implement"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["wallet", "hdwallet", "keystore", "accounts", "chain-agnostic"]
+categories = ["cryptography::cryptocurrencies"]
+
+# Chain-agnostic by construction: this crate depends on the vault and serde only.
+# There is deliberately NO alloy dependency here; anything chain-specific lives
+# behind the `Chain` trait and is supplied by a sibling crate such as
+# daemon-wallet-evm.
+[dependencies]
+daemon-wallet-vault.workspace = true
+serde.workspace = true
+ciborium.workspace = true
+thiserror.workspace = true
+zeroize.workspace = true

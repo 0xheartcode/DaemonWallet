@@ -1,0 +1,16 @@
+[package]
+name = "daemon-wallet-protocol"
+description = "The daemon-wallet plug-in wire contract: versioned request/response envelope, stable DTOs, and a thin typed client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["wallet", "protocol", "rpc", "ethereum", "wire"]
+categories = ["encoding", "api-bindings"]
+
+[dependencies]
+daemon-wallet-core.workspace = true
+daemon-wallet-evm.workspace = true
+alloy-primitives.workspace = true
+serde.workspace = true
+thiserror.workspace = true

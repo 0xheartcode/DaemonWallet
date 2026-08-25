@@ -2,13 +2,30 @@
 # JS packages/ stay as reference during the port.
 [workspace]
 resolver = "3"
-members = ["crates/daemon-wallet-vault"]
+members = [
+    "crates/daemon-wallet-vault",
+    "crates/daemon-wallet-core",
+    "crates/daemon-wallet-evm",
+    "crates/daemon-wallet-protocol",
+]
 
 [workspace.package]
-version = "0.0.1"
+version = "0.0.0"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/CounterFinance/daemonwallet"
 
 [workspace.dependencies]
 # shared deps land here as crates are added
+# internal crates, referenced by path so the workspace is self-contained
+daemon-wallet-vault = { path = "crates/daemon-wallet-vault" }
+daemon-wallet-core = { path = "crates/daemon-wallet-core" }
+daemon-wallet-evm = { path = "crates/daemon-wallet-evm" }
+# alloy-primitives is pinned to a cached, audited point release so the wire and
+# domain surfaces share one definition of Address/U256/B256/Bytes; the serde
+# feature lets those primitives ride inside CBOR manifests and JSON wire frames
+alloy-primitives = { version = "=1.6.1", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+ciborium = "0.2.2"
+thiserror = "2.0"
+zeroize = { version = "1.8", features = ["derive"] }
