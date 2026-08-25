@@ -1,0 +1,25 @@
+[package]
+name = "daemon-wallet-vault"
+description = "Encrypted secret vault (Argon2id + XChaCha20-Poly1305) with metadata, atomic on-disk storage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["encryption", "vault", "argon2", "xchacha20poly1305", "secrets"]
+categories = ["cryptography"]
+
+[dependencies]
+argon2 = "0.5.3"
+chacha20poly1305 = "0.10.1"
+blake2 = "0.10.6"
+zeroize = { version = "1.8", features = ["derive"] }
+getrandom = "0.2.15"
+region = "3.0.2"
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_bytes = "0.11"
+ciborium = "0.2.2"
+tempfile = "3.10"
+
+[dev-dependencies]
+hex = "0.4"
