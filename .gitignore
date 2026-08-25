@@ -8,3 +8,23 @@
 *.njsproj
 *.sln
 *.sw?
+
+# Rust
+/target/
+**/*.rs.bk
+
+# Secrets and runtime
+*.log
+*.sock
+.env
+.env.*
+!.env.example
+**/keystore/
+*.vault
+
+# local railguards + quality tooling, kept local, never committed
+/scripts/check.sh
+/.github/workflows/rust.yml
+/mutants.out/
+/mutants.out.old/
+*.profraw
