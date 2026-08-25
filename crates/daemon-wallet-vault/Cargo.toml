@@ -5,6 +5,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+readme = "README.md"
 keywords = ["encryption", "vault", "argon2", "xchacha20poly1305", "secrets"]
 categories = ["cryptography"]
 
